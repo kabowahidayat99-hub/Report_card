@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>KABOWA HIDAYAT ISLAMIC PRIMARY SCHOOL - Report Card</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+  @media print { .no-print{display:none;} body{margin:0;padding:10mm;background:white;} }
+  body {font-family:Arial,sans-serif; margin:0; background:#f0f8f0;}
+  .page {width:297mm; min-height:210mm; margin:20px auto; background:white; padding:12mm; box-sizing:border-box; box-shadow:0 0 20px rgba(0,0,0,0.3); position:relative;}
+  .header {display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;}
+  .logo-img, .photo-img {cursor:pointer; border:3px solid #006400; border-radius:8px; background:#fff;}
+  .logo-img {height:105px; width:105px; object-fit:contain;}
+  .photo-img {height:130px; width:110px; object-fit:cover;}
+  .school-name {text-align:center; flex:1;}
+  .school-en {font-size:27px; font-weight:bold; color:#006400;}
+  .school-ar {font-size:25px; font-weight:bold; color:#006400;}
+  .promotion {font-size:20px; font-weight:bold; text-align:center; margin:10px 0;}
+  .promoted{color:green;} .notpromoted{color:red;}
+  .info {display:grid; grid-template-columns: 2fr 1fr 1.2fr 1fr 1.5fr; gap:12px; margin:20px 0; align-items:center;}
+  .tables {display:flex; gap:25px; margin:20px 0;}
+  table {border-collapse:collapse; width:49%;}
+  th,td {border:1.5px solid #000; padding:9px; text-align:center;}
+  th {background:#006400; color:white;}
+  .total {background:#ffebee !important; color:red; font-weight:bold;}
+  .right-align {direction:rtl; text-align:right;}
+  .comments {display:flex; gap:25px; margin:25px 0;}
+  .comment-section {width:49%;}
+  .comment-box {border:1px solid #006400; padding:12px; min-height:80px; background:#f9f9f9; border-radius:8px;}
+  .ht-comment {text-align:center; background:#e8f5e8; border:2px solid #006400; padding:15px; font-weight:bold; border-radius:10px; margin:20px 0;}
+  .signatures {display:flex; justify-content:space-between; margin:30px 0;}
+  .sig-left, .sig-right {width:40%; text-align:center;}
+  .sig-middle {width:20%; text-align:center;}
+  .dates {text-align:center; margin:20px 0;}
+  .motto {font-family:"Times New Roman",serif; font-size:23px; font-style:italic; color:#006400; text-align:center; margin:35px 0 10px;}
+  .line {border-top:5px double #000; margin:25px 0;}
+  .printed {position:absolute; bottom:15px; right:20px; font-size:11px; color:#555;}
+  .buttons {text-align:center; margin:40px 0;}
+  button {padding:14px 28px; margin:8px; font-size:17px; border:none; border-radius:10px; cursor:pointer;}
+  .calc-btn {background:#006400; color:white;}
+  .print-btn {background:#1976d2; color:white;}
+  .save-btn {background:#d32f2f; color:white; font-weight:bold;}
+  .info-text {text-align:center; background:#e8f5e8; padding:12px; border-radius:8px; margin:20px 0; font-size:15px;}
+</style>
+</head>
+<body onload="loadSubjectsNow(); updatePrintDate()">
+
+<div class="page" id="reportPage">
+  <div class="header">
+    <img src="" class="logo-img" id="logo" onclick="document.getElementById('logoInput').click()" alt="Click to add School Logo">
+    <div class="school-name">
+      <div class="school-en">KABOWA HIDAYAT ISLAMIC PRIMARY SCHOOL</div>
+      <div class="school-ar">مدرسة الهداية الإسلامية الإبتدائية كابووا</div>
+      <div id="promotion" class="promotion notpromoted">NOT PROMOTED</div>
+    </div>
+    <img src="" id="photo" class="photo-img" onclick="document.getElementById('photoInput').click()" alt="Click to add Student Photo">
+  </div>
+
+  <input type="file" id="logoInput" accept="image/*" style="display:none" onchange="previewImage(this,'logo')">
+  <input type="file" id="photoInput" accept="image/*" style="display:none" onchange="previewImage(this,'photo')">
+
+  <div class="info">
+    <div><b>Student Name:</b> <input type="text" id="name" placeholder="e.g. Aisha Namusoke" style="width:95%"></div>
+    <div><b>Class:</b> <select id="class"><option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option></select></div>
+    <div><b>Position:</b> <input type="text" id="position" placeholder="1st" style="width:50px"> Out of <input type="text" id="outOf" placeholder="35" style="width:50px"></div>
+    <div><b>Section:</b> <select id="section" onchange="loadSubjectsNow()"><option>Lower</option><option>Upper</option></select></div>
+    <div><b>Term/Year:</b> <select id="term"><option>Term 1</option><option>Term 2</option><option>Term 3</option></select> <input type="number" id="year" value="2025" style="width:70px"></div>
+  </div>
+
+  <div class="tables">
+    <table id="secularTable">
+      <thead><tr><th>Subject</th><th>BOT</th><th>MID</th><th>END</th><th>Agg</th><th>Remark</th></tr></thead>
+      <tbody id="secularBody"></tbody>
+      <tfoot><tr class="total"><td>TOTAL</td><td id="secBot">0</td><td id="secMid">0</td><td id="secEnd">0</td><td id="secAggTotal">0</td><td id="secRemark">-</td></tr></tfoot>
+    </table>
+
+    <table id="arabicTable" dir="rtl">
+      <thead><tr><th>المواد الدينية</th><th>أول</th><th>نصف</th><th>آخر</th><th>تقويم</th><th>تقدير</th></tr></thead>
+      <tbody id="arabicBody"></tbody>
+      <tfoot><tr class="total"><td>المجموع</td><td id="arBot">0</td><td id="arMid">0</td><td id="arEnd">0</td><td id="arAggTotal">0</td><td id="arRemark">-</td></tr></tfoot>
+    </table>
+  </div>
+
+  <div class="comments">
+    <div class="comment-section">
+      <b>Class Teacher Comment:</b><div class="comment-box" id="ct"></div>
+      <b>DOS (Secular):</b><div class="comment-box" id="dosSec"></div>
+    </div>
+    <div class="comment-section right-align">
+      <b>تعليق المشرف على الفصل:</b><div class="comment-box" id="ctAr" dir="rtl"></div>
+      <b>مدير الدراسات الدينية:</b><div class="comment-box" id="dosAr" dir="rtl"></div>
+    </div>
+  </div>
+
+  <b>Headteacher's Comment:</b>
+  <div class="ht-comment" id="ht"></div>
+
+  <div class="signatures">
+    <div class="sig-left">___________________________<br><b>Director of Studies (Secular)</b></div>
+    <div class="sig-middle">___________________________<br><b>Headteacher</b><br>[STAMP]</div>
+    <div class="sig-right">___________________________<br><b>Director of Studies (Theology)</b></div>
+  </div>
+
+  <div class="dates">
+    Term Ended on: <input type="date">      Next Term Begins on: <input type="date">
+  </div>
+
+  <div class="line"></div>
+  <div class="motto">"Struggle for Life and the Day of Judgement"</div>
+  <div class="printed">Report Printed on: <span id="printDate"></span></div>
+
+  <div class="buttons no-print">
+    <button class="calc-btn" onclick="calculateAll()">Calculate Results</button>
+    <button class="print-btn" onclick="window.print()">Print Report</button>
+    <button class="save-btn" onclick="saveAsPDF()">Save as PDF (Auto)</button>
+  </div>
+
+  <div class="info-text no-print">
+    The red button saves perfect PDF directly to your phone's Downloads folder — no extra steps!
+  </div>
+</div>
+
+<script>
+function previewImage(input, id){
+  if (input.files && input.files[0]) {
+    document.getElementById(id).src = URL.createObjectURL(input.files[0]);
+  }
+}
+
+const lowerSecular = ["English","Mathematics","Literature 1","Literature 2","Luganda","I.R.E"];
+const upperSecular = ["English","Mathematics","Science","Social Studies"];
+const arabicSubjects = ["القرآن الكريم","الفقه الشرعي","التربية الإسلامية","اللغة العربية"];
+
+function loadSubjectsNow(){
+  const section = document.getElementById("section").value;
+  const subjects = section === "Lower" ? lowerSecular : upperSecular;
+  let html = "";
+  subjects.forEach(sub => html += `<tr><td>${sub}</td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td></td><td></td></tr>`);
+  document.getElementById("secularBody").innerHTML = html;
+
+  let arHTML = "";
+  arabicSubjects.forEach(sub => arHTML += `<tr><td class="right-align">${sub}</td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td></td><td></td></tr>`);
+  document.getElementById("arabicBody").innerHTML = arHTML;
+}
+
+function getAggregate(mark){
+  if(mark >= 80) return 1;
+  if(mark >= 75) return 2;
+  if(mark >= 65) return 3;
+  if(mark >= 60) return 4;
+  if(mark >= 55) return 5;
+  if(mark >= 45) return 6;
+  if(mark >= 35) return 8;
+  return 9;
+}
+
+function getSecularRemark(a){
+  const r = ["","Excellent","Very Good","Good","Promising","Pass","Fair","Improve","Work harder","Work harder"];
+  return r[a] || "Fail";
+}
+function getArabicRemark(a){
+  const r = ["","ممتاز","جيد جداً","جيد","جيد","مقبول","مقبول","ضعيف","راسب","راسب"];
+  return r[a] || "راسب";
+}
+function getSecularDivision(t){if(t<=12)return"Div. 1";if(t<=24)return"Div. 2";if(t<=26)return"Div. 3";if(t<=33)return"Div. 4";return"F";}
+function getArabicDivision(t){if(t<=12)return"ممتاز";if(t<=24)return"جيد جداً";if(t<=26)return"جيد";if(t<=33)return"مقبول";return"راسب";}
+
+const classTeacherComments = {excellent:["Shows outstanding effort and consistency in all subjects."], verygood:["Works diligently and continues to make steady progress."], good:["Shows potential and improving effort in class activities."], average:["Needs to be more consistent with homework and class participation."], weak:["Requires more focus and seriousness during lessons."], poor:["Performance is far below grade expectations; urgent improvement needed."]};
+const dosComments = {excellent:"The learner has demonstrated commendable academic discipline and commitment.", verygood:"Has shown good progress during the term and meets most learning objectives.", good:"Shows potential but needs to strengthen revision routines.", average:"Performance is satisfactory, though class participation should improve.", weak:"Performance indicates gaps in understanding key curriculum areas.", poor:"Performance is below accepted academic standards."};
+const htComments = {excellent:"An impressive performance this term. Keep up the high standards and discipline.", verygood:"A good performance with potential for further improvement.", good:"A fair performance; more effort and discipline will lead to better results.", average:"Performance requires improvement; more focus is needed.", weak:"Performance is below grade expectations and needs immediate attention.", poor:"Urgent academic support is recommended to prevent further decline."};
+
+function calculateAll(){
+  let secBot=0, secMid=0, secEnd=0;
+  let coreSecAgg = 0; let coreSecCount = 0; let coreSecFails = 0;
+  let arBot=0, arMid=0, arEnd=0, arAgg=0, arCount=0, arFails=0;
+  const isLower = document.getElementById("section").value === "Lower";
+
+  document.querySelectorAll("#secularBody tr").forEach((row, index) => {
+    const bot = parseInt(row.cells[1].innerText)||0;
+    const mid = parseInt(row.cells[2].innerText)||0;
+    const end = parseInt(row.cells[3].innerText)||0;
+    secBot += bot; secMid += mid; secEnd += end;
+
+    if (isLower && index >= 4) {
+      row.cells[4].innerText = "";   row.cells[5].innerText = "";
+    } else {
+      const agg = getAggregate(end);
+      row.cells[4].innerText = agg;
+      row.cells[5].innerText = getSecularRemark(agg);
+      coreSecAgg += agg; coreSecCount++;
+      if(agg >= 8) coreSecFails++;
+    }
+  });
+
+  document.querySelectorAll("#arabicBody tr").forEach(row => {
+    const bot = parseInt(row.cells[1].innerText)||0;
+    const mid = parseInt(row.cells[2].innerText)||0;
+    const end = parseInt(row.cells[3].innerText)||0;
+    arBot += bot; arMid += mid; arEnd += end;
+    const agg = getAggregate(end);
+    row.cells[4].innerText = agg;
+    row.cells[5].innerText = getArabicRemark(agg);
+    arAgg += agg; arCount++;
+    if(agg >= 8) arFails++;
+  });
+
+  document.getElementById("secBot").innerText = secBot;
+  document.getElementById("secMid").innerText = secMid;
+  document.getElementById("secEnd").innerText = secEnd;
+  document.getElementById("secAggTotal").innerText = coreSecAgg;
+  document.getElementById("secRemark").innerText = getSecularDivision(coreSecAgg);
+
+  document.getElementById("arBot").innerText = arBot;
+  document.getElementById("arMid").innerText = arMid;
+  document.getElementById("arEnd").innerText = arEnd;
+  document.getElementById("arAggTotal").innerText = arAgg;
+  document.getElementById("arRemark").innerText = getArabicDivision(arAgg);
+
+  const totalAggForPromotion = coreSecAgg + arAgg;
+  const totalSubjectsForPromotion = coreSecCount + arCount;
+  const averageForPromotion = totalSubjectsForPromotion > 0 ? totalAggForPromotion / totalSubjectsForPromotion : 99;
+  const totalFails = coreSecFails + arFails;
+
+  const p = document.getElementById("promotion");
+  if(averageForPromotion <= 4 && totalFails === 0){
+    p.textContent = "PROMOTED"; p.className = "promotion promoted";
+  } else {
+    p.textContent = "NOT PROMOTED"; p.className = "promotion notpromoted";
+  }
+
+  let level = averageForPromotion <= 2.5 ? "excellent" :
+             averageForPromotion <= 4 ? "verygood" :
+             averageForPromotion <= 5.5 ? "good" :
+             averageForPromotion <= 7 ? "average" :
+             averageForPromotion <= 8 ? "weak" : "poor";
+
+  document.getElementById("ct").innerHTML = classTeacherComments[level][0];
+  document.getElementById("dosSec").innerHTML = dosComments[level];
+  document.getElementById("ht").innerHTML = htComments[level];
+  document.getElementById("ctAr").innerHTML = {excellent:"يظهر جهداً متميزاً وثباتاً في جميع المواد.", verygood:"يعمل بجد ويحقق تقدماً ثابتاً.", good:"يظهر إمكانيات جيدة ولكن يحتاج إلى مزيد من التركيز.", average:"يحتاج إلى بذل جهد أكبر والانتظام في أداء الواجبات.", weak:"الأداء دون المستوى المطلوب ويحتاج إلى متابعة جادة.", poor:"الأداء ضعيف جداً ويحتاج إلى تدخل عاجل من الأسرة والمدرسة."}[level];
+  document.getElementById("dosAr").innerHTML = {excellent:"أداء أكاديمي متميز وانضباط عالٍ.", verygood:"تقدم جيد مع إمكانية تحقيق المزيد.", good:"يحتاج إلى دعم ومتابعة أكثر لتحسين الأداء.", average:"الأداء مقبول ولكن يحتاج إلى تحسين.", weak:"يحتاج إلى تدخل فوري لسد الثغرات.", poor:"الأداء دون المستوى المقبول ويحتاج إلى دعم مكثف."}[level];
+
+  updatePrintDate();
+}
+
+function updatePrintDate(){
+  document.getElementById("printDate").innerText = new Date().toLocaleDateString("en-GB", {day:'numeric', month:'long', year:'numeric'});
+}
+
+// AUTO-SAVE PDF FUNCTION (THIS IS THE MAGIC)
+function saveAsPDF() {
+  const { jsPDF } = window.jspdf;
+  const page = document.getElementById("reportPage");
+  
+  // Hide buttons before capturing
+  document.querySelector(".buttons").style.display = "none";
+  document.querySelector(".info-text").style.display = "none";
+
+  html2canvas(page, {scale: 2, useCORS: true, backgroundColor: "#ffffff"}).then(canvas => {
+    const imgData = canvas.toDataURL('image/png');
+    const pdf = new jsPDF('p', 'mm', 'a4');
+    const width = pdf.internal.pageSize.getWidth();
+    const height = pdf.internal.pageSize.getHeight();
+    pdf.addImage(imgData, 'PNG', 0, 0, width, height);
+
+    const name = (document.getElementById("name").value || "Student").trim().replace(/[^a-zA-Z0-9]/g, "_");
+    const cls = document.getElementById("class").value;
+    const term = document.getElementById("term").value.replace(" ","");
+    const year = document.getElementById("year").value;
+    pdf.save(`\( {name}_ \){cls}_\( {term}_ \){year}.pdf`);
+
+    // Show buttons again
+    document.querySelector(".buttons").style.display = "block";
+    document.querySelector(".info-text").style.display = "block";
+  });
+}
+
+loadSubjectsNow();
+</script>
+</body>
+</html>
