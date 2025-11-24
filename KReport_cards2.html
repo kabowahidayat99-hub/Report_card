@@ -18,7 +18,7 @@
   .school-en {font-size:27px; font-weight:bold; color:#006400;}
   .school-ar {font-size:25px; font-weight:bold; color:#006400;}
   .promotion {font-size:20px; font-weight:bold; text-align:center; margin:10px 0;}
-  .promoted{color:green;} .notpromoted{color:red;}
+  .promoted{color:green;} .notpromoted{color:red;}. P.on Probation{color:blue}
   .info {display:grid; grid-template-columns: 2fr 1fr 1.2fr 1fr 1.5fr; gap:12px; margin:20px 0; align-items:center;}
   .tables {display:flex; gap:25px; margin:20px 0;}
   table {border-collapse:collapse; width:49%;}
@@ -53,8 +53,11 @@
     <div class="school-name">
       <div class="school-en">KABOWA HIDAYAT ISLAMIC PRIMARY SCHOOL</div>
       <div class="school-ar">مدرسة الهداية الإسلامية الإبتدائية كابووا</div>
-      <div id="promotion" class="promotion notpromoted">NOT PROMOTED</div>
-    </div>
+      <div class="promotion-box">
+    <h3>Promotion Status</h3>
+    <p><strong><?php echo $promotion; ?></strong></p>
+    <p>Average Score: <?php echo round($average, 2); ?>%</p>
+</div>
     <img src="" id="photo" class="photo-img" onclick="document.getElementById('photoInput').click()" alt="Click to add Student Photo">
   </div>
 
@@ -62,7 +65,7 @@
   <input type="file" id="photoInput" accept="image/*" style="display:none" onchange="previewImage(this,'photo')">
 
   <div class="info">
-    <div><b>Student Name:</b> <input type="text" id="name" placeholder="e.g. Aisha Namusoke" style="width:95%"></div>
+    <div><b>Student Name:</b> <input type="text" id="name" style="width:95%"></div>
     <div><b>Class:</b> <select id="class"><option>P.1</option><option>P.2</option><option>P.3</option><option>P.4</option><option>P.5</option><option>P.6</option><option>P.7</option></select></div>
     <div><b>Position:</b> <input type="text" id="position" placeholder="1st" style="width:50px"> Out of <input type="text" id="outOf" placeholder="35" style="width:50px"></div>
     <div><b>Section:</b> <select id="section" onchange="loadSubjectsNow()"><option>Lower</option><option>Upper</option></select></div>
